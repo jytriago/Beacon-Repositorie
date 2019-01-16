@@ -1,0 +1,90 @@
+doctype html
+html
+  head
+    //script(src='https://code.jquery.com/jquery-3.3.1.js', integrity='sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=', crossorigin='anonymous')
+    script(src='../javascripts/jquery-3.3.1.min.js', type='text/javascript')
+   
+      
+
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h3 Beacon Location
+  
+    
+    h2 
+     ul(id='button')
+      li
+        a(href='#') Inicio
+      li
+        a(href='#') Historico
+      li
+        a(href='#') Servicios
+      li
+        a(href='#') Informacion
+    br
+    br
+    br
+    br
+    br
+    br
+    br
+
+    canvas#myCanvas(width='400', height='400', style='border:1px solid #2E2E2E; background:url(images/grilla_400px.png);')
+    
+    script.
+
+ 
+
+
+
+      setInterval(function(){ 
+        $.get("http://localhost:3000/dataR" ,function(data) {
+          
+        }).done(function(data) {
+          console.log(data);
+          
+            for(i=0;i<data.length;i++){
+              var radius = 5;
+              limpiar();
+              ctx.beginPath();
+              ctx.clearRect(((data[i].x) - radius - 1), ((data[i].y)- radius - 1), (radius * 2 + 2), radius * 2 + 2);
+              ctx.closePath();
+              ctx.arc(data[i].x, data[i].y, radius, 0, Math.PI * 2, true);
+
+              
+               ctx.fill();
+               ctx.closePath()
+            }
+          
+       
+
+
+        }).fail(function(data, textStatus, xhr) {
+          console.log("Linea 48" );
+          console.log("error", data.textStatus);
+          console.log("STATUS: "+xhr);
+        }).always(function() {
+          console.log("Always function");
+        });
+      },1000);
+    
+
+
+      var x = null;
+      var y = null;
+      
+      function graficar_punto(){
+        x = document.getElementById("pos_x").value;
+        y = document.getElementById("pos_y").value;
+        ctx.fillRect(y,x,5,5);
+      };
+
+      var c = document.getElementById("myCanvas");
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "#ff2626";
+
+      ctx.stroke();
+
+      function limpiar(){
+        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+      }
