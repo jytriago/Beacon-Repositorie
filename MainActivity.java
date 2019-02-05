@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     public int countRecord = 0;
     public int muestras = 0;
     public int distancia = 0;
+    public int potenciaRx = 0;
     BluetoothAdapter mBlueAdapter;
 
     public String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Caracterización Beacons";
@@ -84,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
         textArchivo          = (TextView) findViewById( R.id.txtViewValores ) ;
         deviceData           = (TextView) findViewById(R.id.text);
         devicesCountTextView = (TextView) findViewById(R.id.devices_count);
-        TxtMuestras           = (EditText) findViewById( R.id.editTextDistancia );
+        TxtMuestras          = (EditText) findViewById( R.id.editTextDistancia );
         btnIniciar           = (Button)   findViewById( R.id.BtnIniciar );
         mBlueAdapter         =            BluetoothAdapter.getDefaultAdapter();
-        cRecord = (TextView) findViewById(R.id.cRecord);
+        cRecord              = (TextView) findViewById(R.id.cRecord);
         mDistancia           = (EditText) findViewById( R.id.mDistancia );
 
         devicesScanner = new ConfigurableDevicesScanner(this);
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 Double A;
                 Double B;
                 Double C;
-                //distancia = Integer.parseInt(mDistancia.getText().toString());
+                potenciaRx = Integer.parseInt(mDistancia.getText().toString());
 
 
                 String data = "";
@@ -143,13 +144,12 @@ public class MainActivity extends AppCompatActivity {
                             ConfigurableDevicesScanner.ScanResultItem item = list.get( i );
                             distancia = item.rssi.intValue();
 
-                            /*funcion lineal*/
-                            A = (-0.813)*distancia+21.251;
                             /*funcion logaritmica*/
-                            B = (-6.394)*Math.log( distancia )+25.841;
-                            /*Funcion Polinomica*/
-                            C = ((0.00001)*Math.pow( distancia,6 ))-((0.0008)*Math.pow( distancia,5 ))+((0.0216)*Math.pow( distancia,4 ))-
-                                    ((0.2982)*Math.pow( distancia,3 ))+((2.1868)*Math.pow( distancia,2 ))-((8.3502)*Math.pow( distancia,1 ))+29.542;
+                            A = (-7.162)*Math.log( potenciaRx )-70.378;
+                            /*despeje de la funcion logaritmica para distancia*/
+                            B = Math.exp( (70.378+distancia)/-7.162 );
+                            /*funcion lineal para distancia*/
+                            C = (75.854+distancia)/-0.8959;
 
 
                             int numero = 4 * (distancia * (-1));
@@ -169,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
                         if(countRecord==muestras){
                             showToast("Muestreo culminado");
                             stopRecord();
+                            cRecord.setText("0");
+                            countRecord = 0;
                         }else{
                             countRecord++;
                             cRecord.setText(String.valueOf(countRecord));
