@@ -1,4 +1,4 @@
-package com.estimote.configuration;
+kage com.estimote.configuration;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     public  TextView    devicesCountTextView;
     public  TextView    deviceData;
     public  Button      BtnSave, BtnLoad, btnIniciar;
-    public  TextView    textArchivo, cRecord;
+    public  TextView    textArchivo, cRecord, distanciaTextView;
     public  EditText    TxtMuestras, mDistancia;
 
     public boolean record = false;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         mBlueAdapter         =            BluetoothAdapter.getDefaultAdapter();
         cRecord              = (TextView) findViewById(R.id.cRecord);
         mDistancia           = (EditText) findViewById( R.id.mDistancia );
-
+        distanciaTextView    = (TextView) findViewById( R.id.distanciaTextView ) ;
         devicesScanner = new ConfigurableDevicesScanner(this);
         devicesScanner.setScanPeriodMillis(1000);
 
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 String data = "";
+                String data2 = "";
                 if (!list.isEmpty()) {
                     if(record){
                         for (int i = 0; i < list.size(); i++) {
@@ -148,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
                             A = (-7.162)*Math.log( potenciaRx )-70.378;
                             /*despeje de la funcion logaritmica para distancia*/
                             B = Math.exp( (70.378+distancia)/-7.162 );
-                            /*funcion lineal para distancia*/
-                            C = (75.854+distancia)/-0.8959;
+                            /*despeje de la funcion logaritmica para distancia funcion de muestreo dia 2*/
+                            C = Math.exp( (76.05+distancia)/-6.391 );
 
 
                             int numero = 4 * (distancia * (-1));
@@ -163,17 +164,20 @@ public class MainActivity extends AppCompatActivity {
                                     B + "," +
                                     C + "," +
                                     fecha + "\n";
+
+                            data2 = data2 + item.rssi.toString() + ";" + "\n" + B + ";" + "\n" + C + "\n";
                         }
                         buffMuestras=buffMuestras+data;
                         textArchivo.setText( buffMuestras );
+                        distanciaTextView.setText( data2 );
                         if(countRecord==muestras){
                             showToast("Muestreo culminado");
                             stopRecord();
-                            cRecord.setText("0");
+                            cRecord.setText( getString( R.string.nro_de_registro ) +":"+ "0");
                             countRecord = 0;
                         }else{
                             countRecord++;
-                            cRecord.setText(String.valueOf(countRecord));
+                            cRecord.setText( getString( R.string.nro_de_registro ) +": "+ String.valueOf(countRecord));
                         }
                     }
 
